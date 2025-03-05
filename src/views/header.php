@@ -16,8 +16,8 @@
             <li class="nav-item">
                 <a class="nav-link" href="#">Contact</a>
             </li>
-            <li class="nav-item">
-                <button class="btn btn-signin">Sign In</button>
+            <li class="nav-item">      
+                <button class="btn btn-signin" data-bs-toggle="modal" data-bs-target="#loginModal">Sign In</button>
             </li>
         </ul>
     </div>

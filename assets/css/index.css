@@ -139,6 +139,7 @@ body {
     }
     .rectangle-text h1 {
         font-size: 2rem;
+        margin-top: 40px;
     }
     .rectangle-text p {
         font-size: 1rem;
