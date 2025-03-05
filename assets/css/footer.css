@@ -1,0 +1,37 @@
+.footer {
+    background: #2b2a29;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 200px;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+.footer-logo img {
+    max-height: 40px;
+}
+
+.footer-links a {
+    color: white;
+    font-size: 11px;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.footer-links a:hover {
+    color: #ffcc00;
+}
+
+.footer-social img:hover {
+    transform: scale(1.2);
+}
