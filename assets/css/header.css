@@ -1,16 +1,18 @@
+/* assets/css/header.css */
 .navbar {
     padding: 1.8rem 4rem; 
-    background: transparent;
+    background: rgb(176, 222, 251); /* Sky blue background with some transparency rgb(176, 222, 251) */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 .navbar.scrolled {
-    background-color: #ffffff !important;
+    background: rgba(243, 241, 238, 0.8); /* Dark background with transparency */
+    backdrop-filter: blur(10px); /* Glassy effect */
 }
 
 .navbar-brand img {
@@ -21,7 +23,7 @@
 .navbar-nav .nav-link {
     font-size: 1.2rem;
     margin-right: 1.5rem;
-    color: #2b2a29 !important;
+    color: rgb(8, 8, 8) !important; /* White text color */
     position: relative;
     transition: color 0.3s ease-in-out;
     font-weight: 500;
@@ -52,12 +54,34 @@
     border-radius: 30px;
     transition: 0.3s ease-in-out;
     background-color: rgba(255, 255, 255, 0.2);
-    border: 1px solid #2b2a29;
-    color: #2b2a29;
+    border: 1px solid #ffffff; /* White border */
+    color: #161212; /* White text color */
     font-weight: bold;
 }
 
 .btn-signin:hover {
     background: #ff8000;
     color: #000000;
+}
+
+.navbar-toggler {
+    border-color: rgba(0, 0, 0, 0.1); /* Change the border color of the button */
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); /* Change the icon color to black */
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem 2rem;
+    }
+    .navbar-nav .nav-link {
+        font-size: 1rem;
+        margin-right: 1rem;
+    }
+    .btn-signin {
+        font-size: 0.9rem;
+        padding: 0.4rem 1.2rem;
+    }
 }
