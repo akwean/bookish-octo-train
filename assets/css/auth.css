@@ -1,0 +1,50 @@
+/* assets/css/auth.css */
+.modal-content {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(to right, #87cefae6, #ffffff, #ff9830);
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-title {
+    font-weight: bold;
+    color: #2b2a29;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+}
+
+.modal-body .form-label {
+    font-weight: bold;
+    color: #2b2a29;
+}
+
+.modal-body .form-control {
+    border-radius: 5px;
+    border: 1px solid #2b2a29;
+}
+
+.modal-body .btn-primary {
+    background-color: #ff8000;
+    border: none;
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+}
+
+.modal-body .btn-primary:hover {
+    background-color: #2b2a29;
+    color: #ffffff;
+}
