@@ -135,7 +135,6 @@ body {
     }
     .rectangle-text {
         position: static;
-        margin-bottom: 20px;
         text-align: center;
     }
     .rectangle-text h1 {
@@ -147,7 +146,7 @@ body {
     .rectangle-image {
         position: static;
         text-align: center;
-        margin-top: 20px;
+       
     }
     .rectangle-image img {
         max-width: 50%; /* Adjust the size for mobile devices */
