@@ -24,8 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_id = $userController->register($name, $email, $password);
     
     if ($user_id) {
-        // Registration successful
-        header("Location: /index.php?success=registered#loginModal");
+        // Registration successful - AUTO LOGIN
+        session_start(); // Start session if not already started
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['user_email'] = $email;
+        $_SESSION['user_name'] = $name;
+        
+        // Redirect to index page as logged in user
+        header("Location: /index.php?success=welcome");
         exit();
     } else {
         // Registration failed

@@ -1,5 +1,6 @@
 <?php
 require_once 'connection.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/src/Controllers/helper.php';
 
 // // If a user is logged in, redirect them to the dashboard.
 if (isset($_SESSION['user_id'])) 
@@ -26,7 +27,16 @@ if (isset($_SESSION['user_id']))
 
 <div class="full-width-rectangle">
     <div class="rectangle-text">
-        <h1>Welcome to BUPC Clinic</h1>
+        <h1>Welcome to BUPC Clinic<?php
+          if(isset($_SESSION['user_id'])) {
+            $fullname = getUserName($_SESSION['user_id'], $conn);
+            $firstname = explode(' ', $fullname)[0];
+            echo ", " . $firstname;
+        } else {
+            echo "";
+          }
+         ?> 
+        </h1>
         <p>Your health is our priority. We provide quality medical services to ensure your well-being.</p>
     </div>
     <div class="rectangle-image">
