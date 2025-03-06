@@ -16,9 +16,25 @@
             <li class="nav-item">
                 <a class="nav-link" href="#">Contact</a>
             </li>
-            <li class="nav-item">      
-                <button class="btn btn-signin" data-bs-toggle="modal" data-bs-target="#loginModal">Sign In</button>
-            </li>
+            <?php if(isset($_SESSION['user_id'])): ?>
+                <!-- Show these options when user is logged in -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        My Account
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">My Appointments</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/process/logout_process.php">Logout</a></li>
+                    </ul>
+                </li>
+            <?php else: ?>
+                <!-- Show login button when user is not logged in -->
+                <li class="nav-item">      
+                    <button class="btn btn-signin" data-bs-toggle="modal" data-bs-target="#loginModal">Sign In</button>
+                </li>
+            <?php endif; ?>
         </ul>
     </div>
 </nav>

@@ -49,7 +49,17 @@ if (isset($_SESSION['user_id']))
         </a>
     </div>
 </div>
+<?php
+require_once 'connection.php';
 
+// Debug information
+echo "<div style='background: #eee; padding: 10px; margin: 10px; border: 1px solid #ccc;'>";
+echo "Session ID: " . session_id() . "<br>";
+echo "User ID in session: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'Not set') . "<br>";
+echo "</div>";
+
+// Rest of your code
+?>
 <?php include 'src/views/footer.php'; ?>
 
 <!-- Login Modal -->

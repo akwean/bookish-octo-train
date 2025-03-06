@@ -10,6 +10,10 @@ class UserController {
     
     // Authentication methods
     public function login($email, $password) {
+        // Make sure session is started
+    if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+    }
         // Validate credentials and create session
         return $this->userModel->authenticate($email, $password);
     }
@@ -21,8 +25,8 @@ class UserController {
     
     public function logout() {
         // End user session
+        session_start(); 
         session_destroy();
-        header("Location: index.php");
     }
     
     // Profile management

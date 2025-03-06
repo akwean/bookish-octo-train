@@ -29,14 +29,11 @@ class User {
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();
-        $stmt->store_result();
+        $result = $stmt->get_result();
         
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($this->user_id, $hashed_password);
-            $stmt->fetch();
-            
-            if (password_verify($password, $hashed_password)) {
-                return $this->user_id;
+        if ($row = $result->fetch_assoc()) {
+            if (password_verify($password, $row['password'])) {
+                return $row['user_id'];
             }
         }
         return false;
