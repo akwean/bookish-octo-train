@@ -49,18 +49,6 @@ if (isset($_SESSION['user_id']))
         </a>
     </div>
 </div>
-<?php
-require_once 'connection.php';
-
-// Debug information
-echo "<div style='background: #eee; padding: 10px; margin: 10px; border: 1px solid #ccc;'>";
-echo "Session ID: " . session_id() . "<br>";
-echo "User ID in session: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'Not set') . "<br>";
-echo "</div>";
-
-// Rest of your code
-?>
-<?php include 'src/views/footer.php'; ?>
 
 <!-- Login Modal -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
@@ -88,8 +76,10 @@ echo "</div>";
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 <script src="assets/js/header.js"></script>
+<script src="assets/js/custom-dropdown.js"></script>
 
 </body>
 </html>

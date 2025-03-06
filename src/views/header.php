@@ -19,9 +19,13 @@
             <?php if(isset($_SESSION['user_id'])): ?>
                 <!-- Show these options when user is logged in -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- This trigger element is essential even without dropdown-toggle class -->
+                    <a class="nav-link" href="#" id="navbarDropdown" 
+                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         My Account
-                    </a>
+                        <!-- Custom icon instead of default caret -->
+                        <i class="bi bi-person-circle ms-1"></i>
+                                    </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#">Profile</a></li>
                         <li><a class="dropdown-item" href="#">My Appointments</a></li>
@@ -36,5 +40,6 @@
                 </li>
             <?php endif; ?>
         </ul>
+            </div>
     </div>
 </nav>
