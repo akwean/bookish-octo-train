@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     foreach ($required as $field) {
         if (empty($appointmentData[$field])) {
-            header("Location: /appointments.php?error=missing_fields");
-            exit();
+            $date = $_POST['appointment_date'];
+header("Location: /appointments.php?error=missing_fields&date=" . $date);
         }
     }
     
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     if ($appointment_id) {
         // Success
-        header("Location: /index.php?success=appointment_booked");
+        header("Location: /appointments.php?success=appointment_booked");
         exit();
     } else {
         // Error

@@ -29,7 +29,49 @@ $appointmentController = new AppointmentController();
 
 <?php include 'src/views/header.php'; ?>
 
-<div class="appointment-container container mt-5 pt-5">
+<!-- Add notification system -->
+<div class="notification-container container mt-5 pt-5">
+    <?php if(isset($_GET['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php 
+                switch($_GET['success']) {
+                    case 'appointment_booked':
+                        echo "<strong>Success!</strong> Your appointment has been booked successfully.";
+                        break;
+                    default:
+                        echo "<strong>Success!</strong> Your request has been processed.";
+                }
+            ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php elseif(isset($_GET['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong> 
+            <?php 
+                switch($_GET['error']) {
+                    case 'missing_fields':
+                        echo "Please fill in all required fields.";
+                        break;
+                    case 'slot_taken':
+                        echo "This appointment slot is already taken. Please choose another time.";
+                        break;
+                    case 'database_error':
+                        echo "There was a database issue while booking your appointment. Please try again.";
+                        break;
+                    case 'login_required':
+                        echo "You must be logged in to book an appointment.";
+                        break;
+                    default:
+                        echo "An unexpected error occurred. Please try again.";
+                }
+            ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+</div>
+
+
+<div class="appointment-container container mt-3">
     <h2 class="text-center mt-4  mb-4">Book an Appointment</h2>
     
     <div class="row">
@@ -72,18 +114,60 @@ document.addEventListener('DOMContentLoaded', function() {
             loadAppointmentForm(dateStr);
         }
     });
+
+    // Check for URL parameters that indicate errors
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasError = urlParams.has('error');
+    const savedDate = urlParams.get('date');
     
-    function loadAppointmentForm(date) {
-        const formContainer = document.getElementById('form-container');
+    // If there's an error and a saved date, automatically select that date
+    if (hasError && savedDate) {
+        // Select the date in the calendar
+        fp.setDate(savedDate);
         
+        // Load the appointment form with the error
+        loadAppointmentForm(savedDate);
+    }
+    
+    // ONLY ONE loadAppointmentForm function - the one with form data persistence
+    function loadAppointmentForm(date) {
+        // Save existing form data before replacing the form
+        const formData = {};
+        const currentForm = document.getElementById('appointment-form');
+        
+        if (currentForm) {
+            // Save all form field values
+            const inputs = currentForm.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.id !== 'appointment-date') { // Don't save the date
+                    formData[input.id] = input.value;
+                }
+            });
+        }
+        
+        // Load new form
+        const formContainer = document.getElementById('form-container');
         formContainer.innerHTML = `
             <?php include 'src/views/appointment_form.php'; ?>
         `;
         
+        // Set the selected date
         document.getElementById('appointment-date').value = date;
+        
+        // Restore previously entered form data
+        if (Object.keys(formData).length > 0) {
+            Object.keys(formData).forEach(id => {
+                const field = document.getElementById(id);
+                if (field) {
+                    field.value = formData[id];
+                }
+            });
+        }
+        
+        // Load available time slots
         loadAvailableTimeSlots(date);
         
-        // Initialize form submission handler after form is loaded
+        // Initialize form submission handler
         initFormHandler();
     }
     
@@ -155,47 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-US', options);
     }
-
-    function loadAppointmentForm(date) {
-    // Save existing form data before replacing the form
-    const formData = {};
-    const currentForm = document.getElementById('appointment-form');
-    
-    if (currentForm) {
-        // Save all form field values
-        const inputs = currentForm.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-            if (input.id !== 'appointment-date') { // Don't save the date
-                formData[input.id] = input.value;
-            }
-        });
-    }
-    
-    // Load new form
-    const formContainer = document.getElementById('form-container');
-    formContainer.innerHTML = `
-        <?php include 'src/views/appointment_form.php'; ?>
-    `;
-    
-    // Set the selected date
-    document.getElementById('appointment-date').value = date;
-    
-    // Restore previously entered form data
-    if (Object.keys(formData).length > 0) {
-        Object.keys(formData).forEach(id => {
-            const field = document.getElementById(id);
-            if (field) {
-                field.value = formData[id];
-            }
-        });
-    }
-    
-    // Load available time slots
-    loadAvailableTimeSlots(date);
-    
-    // Initialize form submission handler
-    initFormHandler();
-}
 });
 </script>
 
