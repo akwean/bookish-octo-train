@@ -192,47 +192,74 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function initFormHandler() {
-        const form = document.getElementById('appointment-form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent the default form submission
+    const form = document.getElementById('appointment-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+            
+            // Check form validity
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Populate confirmation modal with form data
+            document.getElementById('confirm-date').textContent = formatDate(document.getElementById('appointment-date').value);
+            document.getElementById('confirm-time').textContent = document.getElementById('time_slot').value;
+            document.getElementById('confirm-name').textContent = document.getElementById('name').value;
+            document.getElementById('confirm-course').textContent = document.getElementById('course').value;
+            document.getElementById('confirm-block').textContent = document.getElementById('block').value;
+            
+            // For select elements, get the selected option's text
+            const yearSelect = document.getElementById('year');
+            document.getElementById('confirm-year').textContent = yearSelect.options[yearSelect.selectedIndex].text;
+            
+            const purposeSelect = document.getElementById('purpose');
+            document.getElementById('confirm-purpose').textContent = purposeSelect.options[purposeSelect.selectedIndex].text;
+            
+            document.getElementById('confirm-parent').textContent = document.getElementById('parent_guardian').value;
+            document.getElementById('confirm-contact').textContent = document.getElementById('contact_no').value;
+            document.getElementById('confirm-address').textContent = document.getElementById('home_address').value;
+            document.getElementById('confirm-notes').textContent = document.getElementById('additional_notes').value || 'None';
+            
+            // Show the modal
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            confirmationModal.show();
+            
+            // Remove any existing event listener first (important!)
+            const confirmBtn = document.getElementById('confirm-submit');
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            
+            // Attach the event listener to the new button
+            newConfirmBtn.addEventListener('click', function() {
+                // Get the modal instance
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
                 
-                // Check form validity
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
+                // Hide the modal
+                modalInstance.hide();
                 
-                // Populate confirmation modal with form data
-                document.getElementById('confirm-date').textContent = formatDate(document.getElementById('appointment-date').value);
-                document.getElementById('confirm-time').textContent = document.getElementById('time_slot').value;
-                document.getElementById('confirm-name').textContent = document.getElementById('name').value;
-                document.getElementById('confirm-course').textContent = document.getElementById('course').value;
-                document.getElementById('confirm-block').textContent = document.getElementById('block').value;
+                // Get the loading overlay elements
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                const progressBar = document.getElementById('progressBar');
                 
-                // For select elements, get the selected option's text
-                const yearSelect = document.getElementById('year');
-                document.getElementById('confirm-year').textContent = yearSelect.options[yearSelect.selectedIndex].text;
+                // Make sure loading overlay is visible
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.classList.add('active');
                 
-                const purposeSelect = document.getElementById('purpose');
-                document.getElementById('confirm-purpose').textContent = purposeSelect.options[purposeSelect.selectedIndex].text;
+                // Start progress bar animation
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 100);
                 
-                document.getElementById('confirm-parent').textContent = document.getElementById('parent_guardian').value;
-                document.getElementById('confirm-contact').textContent = document.getElementById('contact_no').value;
-                document.getElementById('confirm-address').textContent = document.getElementById('home_address').value;
-                document.getElementById('confirm-notes').textContent = document.getElementById('additional_notes').value || 'None';
-                
-                // Show the modal
-                const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-                confirmationModal.show();
-                
-                // Handle confirmation button
-                document.getElementById('confirm-submit').addEventListener('click', function() {
-                    form.submit(); // Submit the form when confirmed
-                });
+                // Delay form submission to show loading animation
+                setTimeout(function() {
+                    form.submit(); // Submit the form after delay
+                }, 2000); // 2 second delay for the animation
             });
-        }
+        });
     }
+}
     
     // Helper function to format date
     function formatDate(dateString) {
@@ -241,6 +268,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner-large"></div>
+    <p class="loading-message">Processing your appointment...</p>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+</div>
 
 </body>
 </html>
