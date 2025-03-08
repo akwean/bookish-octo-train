@@ -89,7 +89,53 @@ if (isset($_SESSION['user_id']))
 <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 <script src="assets/js/header.js"></script>
-<script src="assets/js/custom-dropdown.js"></script>
+<!-- Login modal trigger script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check URL parameters for login_required error
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginError = urlParams.get('error');
+    const loginModal = document.getElementById('loginModal');
+    
+    // Function to clean up any login alerts
+    function removeLoginAlerts() {
+        const existingAlerts = document.querySelectorAll('#loginModal .alert-warning');
+        existingAlerts.forEach(alert => alert.remove());
+    }
+    
+    // Add event listener to clean up alerts when modal is hidden
+    loginModal.addEventListener('hidden.bs.modal', function() {
+        removeLoginAlerts();
+    });
+    
+    // When the sign-in button is clicked directly, make sure there's no alert
+    document.querySelector('.btn-signin').addEventListener('click', function() {
+        removeLoginAlerts();
+    });
+    
+    // If login is required, show the login modal automatically with a message
+    if (loginError === 'login_required') {
+        // Show login modal
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show();
+        
+        // First remove any existing alerts
+        removeLoginAlerts();
+        
+        // Then add the new alert
+        const loginAlert = document.createElement('div');
+        loginAlert.className = 'alert alert-warning mb-3';
+        loginAlert.innerHTML = '<i class="bi bi-shield-lock"></i> You need to log in to access that page.';
+        
+        // Insert the alert at the top of the login form
+        const loginForm = document.querySelector('#loginModal .modal-body form');
+        loginForm.insertBefore(loginAlert, loginForm.firstChild);
+        
+        // Clean up the URL to remove the parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
+</script>
 
 </body>
 </html>
