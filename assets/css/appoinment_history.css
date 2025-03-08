@@ -1,0 +1,69 @@
+/* Appointment card styling */
+.appointment-card {
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.appointment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* Status badges */
+.status-pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+.status-confirmed {
+    background-color: #28a745;
+    color: white;
+}
+.status-cancelled {
+    background-color: #dc3545;
+    color: white;
+}
+.status-completed {
+    background-color: #007bff;
+    color: white;
+}
+.status-badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50px;
+    font-weight: bold;
+}
+
+/* Text styling */
+.appointment-date {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ff8000;
+}
+.appointment-time {
+    font-weight: bold;
+    color: #2b2a29;
+}
+.no-appointments {
+    text-align: center;
+    padding: 50px 0;
+    color: #6c757d;
+}
+
+/* Button styling */
+#refreshBtn {
+    background-color: #ff8000;
+    border: none;
+}
+#refreshBtn:hover {
+    background-color: #e67300;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    margin: 20px 0;
+}
