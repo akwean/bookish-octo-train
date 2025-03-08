@@ -56,12 +56,12 @@ header("Location: /appointments.php?error=missing_fields&date=" . $date);
     $appointment_id = $appointmentController->bookAppointment($appointmentData);
     
     if ($appointment_id) {
-        // Success
-        header("Location: /appointments.php?success=appointment_booked");
+        // Success - Redirect to appointment history page with auto-refresh parameter
+        header("Location: /appointments_history.php?success=appointment_booked&refresh=true");
         exit();
     } else {
-        // Error
-        header("Location: /appointments.php?error=database_error");
+        // Error - Redirect with error message
+        header("Location: /appointments.php?error=database_error&date=" . $appointmentData['appointment_date']);
         exit();
     }
 }

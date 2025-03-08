@@ -51,7 +51,7 @@ if (isset($_SESSION['user_id']))
         <a href="AI.html" class="small-rectangle">
             <img src="assets/images/ai-icon.png" alt=""> Artificial Intelligence
         </a>
-        <a href="History.html" class="small-rectangle">
+        <a href="appointments_history.php" class="small-rectangle">
             <img src="assets/images/history-icon.png" alt=""> History
         </a>
         <a href="#" class="small-rectangle">

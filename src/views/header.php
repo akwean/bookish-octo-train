@@ -28,7 +28,7 @@
                                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li><a class="dropdown-item" href="#">My Appointments</a></li>
+                        <li><a class="dropdown-item" href="appointments_history.php">My Appointments</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/process/logout_process.php">Logout</a></li>
                     </ul>

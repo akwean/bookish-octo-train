@@ -60,7 +60,8 @@ class Appointment {
     
     // Get appointments for a user
     public function getUserAppointments($user_id) {
-        $query = "SELECT * FROM {$this->table} WHERE user_id = ? ORDER BY appointment_date ASC, time_slot ASC";
+        // Change from ASC to DESC for appointment_date to get newest first
+        $query = "SELECT * FROM {$this->table} WHERE user_id = ? ORDER BY created_at DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -68,7 +69,7 @@ class Appointment {
         $result = $stmt->get_result();
         $appointments = [];
         
-        while ($row = $result->fetch_assoc()) {
+        while($row = $result->fetch_assoc()) {
             $appointments[] = $row;
         }
         
