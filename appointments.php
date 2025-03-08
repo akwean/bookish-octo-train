@@ -155,6 +155,47 @@ document.addEventListener('DOMContentLoaded', function() {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-US', options);
     }
+
+    function loadAppointmentForm(date) {
+    // Save existing form data before replacing the form
+    const formData = {};
+    const currentForm = document.getElementById('appointment-form');
+    
+    if (currentForm) {
+        // Save all form field values
+        const inputs = currentForm.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.id !== 'appointment-date') { // Don't save the date
+                formData[input.id] = input.value;
+            }
+        });
+    }
+    
+    // Load new form
+    const formContainer = document.getElementById('form-container');
+    formContainer.innerHTML = `
+        <?php include 'src/views/appointment_form.php'; ?>
+    `;
+    
+    // Set the selected date
+    document.getElementById('appointment-date').value = date;
+    
+    // Restore previously entered form data
+    if (Object.keys(formData).length > 0) {
+        Object.keys(formData).forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                field.value = formData[id];
+            }
+        });
+    }
+    
+    // Load available time slots
+    loadAvailableTimeSlots(date);
+    
+    // Initialize form submission handler
+    initFormHandler();
+}
 });
 </script>
 
