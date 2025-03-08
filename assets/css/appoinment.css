@@ -1,0 +1,50 @@
+.appointment-container {
+    margin-top: 120px; /* Adjust based on your navbar height */
+    margin-bottom: 50px;
+}
+
+.flatpickr-calendar {
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.flatpickr-day.selected {
+    background: #ff8000 !important;
+    border-color: #ff8000 !important;
+}
+
+.flatpickr-day:hover {
+    background: #ffd9b3 !important;
+}
+
+.flatpickr-day.today {
+    border-color: #ff8000 !important;
+    color: #ff8000 !important;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.card-header {
+    background: linear-gradient(to right, #87cefa, #ffffff, #ff9830);
+    border: none;
+    padding: 1rem 1.5rem;
+    color: #2b2a29;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #ff8000;
+    border-color: #ff8000;
+}
+
+.btn-primary:hover {
+    background-color: #e67300;
+    border-color: #e67300;
+}

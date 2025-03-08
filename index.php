@@ -42,7 +42,7 @@ if (isset($_SESSION['user_id']))
     <div class="rectangle-image">
         <img src="assets/images/Nurse.png" alt="Clinic Image">
     </div>
-    <a href="appointments.html" class="book-appointment">Book Appointment</a>
+    <a href="appointments.php" class="book-appointment">Book Appointment</a>
 </div>
 
 <div class="content-layout">
