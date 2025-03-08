@@ -114,3 +114,72 @@ if(isset($_SESSION['user_id'])) {
         </form>
     </div>
 </div>
+
+<!-- Add this at the end of appointment_form.php, just before the closing </div> tag -->
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirm Your Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    Please review your appointment details before confirming.
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Date:</strong> <span id="confirm-date"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Time:</strong> <span id="confirm-time"></span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Name:</strong> <span id="confirm-name"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Course:</strong> <span id="confirm-course"></span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Block:</strong> <span id="confirm-block"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Year:</strong> <span id="confirm-year"></span>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <strong>Purpose:</strong> <span id="confirm-purpose"></span>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Parent/Guardian:</strong> <span id="confirm-parent"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Contact Number:</strong> <span id="confirm-contact"></span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Home Address:</strong> <span id="confirm-address"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Additional Notes:</strong> <span id="confirm-notes"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-submit">Confirm Appointment</button>
+            </div>
+        </div>
+    </div>
+</div>

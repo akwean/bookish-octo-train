@@ -48,3 +48,59 @@
     background-color: #e67300;
     border-color: #e67300;
 }
+
+.modal {
+    padding-right: 0 !important;
+}
+
+.modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+    margin: 1.75rem auto;
+}
+
+/* Modal styling */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(to right, #87cefa, #ffffff, #ff9830);
+    color: #2b2a29;
+    border-bottom: none;
+    padding: 1.2rem 1.5rem;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 1.2rem 1.5rem;
+}
+
+/* Confirmation details */
+.modal-body strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.modal-body span {
+    color: #555;
+}
+
+@media (min-width: 576px) {
+    .modal-dialog {
+        min-height: calc(100% - 3.5rem);
+    }
+}
+
+/* Ensure modal animation slides from the center */
+.modal.fade .modal-dialog {
+    transform: translate(0, -50px);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}

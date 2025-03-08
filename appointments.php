@@ -69,30 +69,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         ],
         onChange: function(selectedDates, dateStr) {
-            // Load the appointment form with the selected date
             loadAppointmentForm(dateStr);
         }
     });
     
     function loadAppointmentForm(date) {
-        // In a real app, this would load the form via AJAX
-        // For simplicity, we'll include the form directly
         const formContainer = document.getElementById('form-container');
         
-        // You'd typically fetch this via AJAX
         formContainer.innerHTML = `
             <?php include 'src/views/appointment_form.php'; ?>
         `;
         
-        // Set the selected date
         document.getElementById('appointment-date').value = date;
-        
-        // Load available time slots via AJAX
         loadAvailableTimeSlots(date);
+        
+        // Initialize form submission handler after form is loaded
+        initFormHandler();
     }
     
     function loadAvailableTimeSlots(date) {
-        // In a real application, this would be an AJAX call to get available slots
         const timeSlots = [
             "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", 
             "1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", 
@@ -110,6 +105,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 selectElement.appendChild(option);
             });
         }
+    }
+    
+    function initFormHandler() {
+        const form = document.getElementById('appointment-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent the default form submission
+                
+                // Check form validity
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                // Populate confirmation modal with form data
+                document.getElementById('confirm-date').textContent = formatDate(document.getElementById('appointment-date').value);
+                document.getElementById('confirm-time').textContent = document.getElementById('time_slot').value;
+                document.getElementById('confirm-name').textContent = document.getElementById('name').value;
+                document.getElementById('confirm-course').textContent = document.getElementById('course').value;
+                document.getElementById('confirm-block').textContent = document.getElementById('block').value;
+                
+                // For select elements, get the selected option's text
+                const yearSelect = document.getElementById('year');
+                document.getElementById('confirm-year').textContent = yearSelect.options[yearSelect.selectedIndex].text;
+                
+                const purposeSelect = document.getElementById('purpose');
+                document.getElementById('confirm-purpose').textContent = purposeSelect.options[purposeSelect.selectedIndex].text;
+                
+                document.getElementById('confirm-parent').textContent = document.getElementById('parent_guardian').value;
+                document.getElementById('confirm-contact').textContent = document.getElementById('contact_no').value;
+                document.getElementById('confirm-address').textContent = document.getElementById('home_address').value;
+                document.getElementById('confirm-notes').textContent = document.getElementById('additional_notes').value || 'None';
+                
+                // Show the modal
+                const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                confirmationModal.show();
+                
+                // Handle confirmation button
+                document.getElementById('confirm-submit').addEventListener('click', function() {
+                    form.submit(); // Submit the form when confirmed
+                });
+            });
+        }
+    }
+    
+    // Helper function to format date
+    function formatDate(dateString) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
     }
 });
 </script>
