@@ -1,0 +1,48 @@
+# Environment files
+.env
+.env.local
+.env.backup
+
+# Composer dependencies
+/vendor/
+
+# Docker volumes data
+/db_data/
+*.sql
+*.dump
+
+# User uploaded content
+/uploads/
+
+# Cache and logs
+/cache/
+/logs/
+*.log
+
+# IDE specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+.komodotools/
+*.code-workspace
+.phpunit.result.cache
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Zone identifier files (Windows)
+*:Zone.Identifier
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*~
