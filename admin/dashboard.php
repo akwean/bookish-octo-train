@@ -47,24 +47,29 @@ if ($result->num_rows > 0) {
         font-size: 0.9rem;
     }
     
-    /* Fix dropdown positioning - CRITICAL FIX */
     .dropdown-menu {
-        position: fixed !important; 
-        z-index: 1050 !important;
-        margin: 0 !important;
-    }
-    
-    /* Make sure dropdowns are big enough */
-    .dropdown-menu {
-        min-width: 10rem;
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-    }
-    
-    /* Prevent vertical scrolling in the table for most screens */
-    .table-container {
-        max-height: none;
-        overflow: visible;
-    }
+    position: absolute !important;
+    transform: none !important;
+    top: 100% !important;
+    left: auto !important;
+    right: 0 !important;
+    margin-top: 2px !important;
+    min-width: 10rem;
+}
+
+.dropdown {
+    position: relative !important;
+}
+
+.table-responsive {
+    overflow: visible !important;
+}
+
+/* Make dropdown items more clickable */
+.dropdown-item {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
     
     /* Better hover effects */
     .table tr:hover {
@@ -138,7 +143,7 @@ if ($result->num_rows > 0) {
         <!-- Replace your entire table div with this: -->
 <div class="card shadow-sm">
     <div class="card-body p-0">
-        <div class="table-responsive" style="over-flow: visible;">
+        <div class="table-responsive" style="overflow: visible;">
             <table class="table table-striped table-hover m-0">
                 <thead class="table-light">
                     <tr>
