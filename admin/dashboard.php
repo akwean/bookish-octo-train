@@ -39,6 +39,64 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Add this in the <head> section -->
+    <style>
+    /* Improved table styles */
+    .table {
+        font-size: 0.9rem;
+    }
+    
+    /* Fix dropdown positioning - CRITICAL FIX */
+    .dropdown-menu {
+        position: fixed !important; 
+        z-index: 1050 !important;
+        margin: 0 !important;
+    }
+    
+    /* Make sure dropdowns are big enough */
+    .dropdown-menu {
+        min-width: 10rem;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+    }
+    
+    /* Prevent vertical scrolling in the table for most screens */
+    .table-container {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    /* Better hover effects */
+    .table tr:hover {
+        background-color: rgba(13, 110, 253, 0.05) !important;
+    }
+    
+    /* Make status badges bigger */
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.35em 0.65em;
+    }
+    
+    /* Action buttons */
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        margin-right: 0.25rem;
+    }
+    
+    /* Make sure action column doesn't wrap */
+    .action-column {
+        white-space: nowrap;
+        min-width: 160px;
+    }
+    
+    /* Only add vertical scrolling on very small screens */
+    @media (max-height: 600px) {
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    }
+</style>
 </head>
 <body>
     <?php include "includes/header.php"; ?>
@@ -77,30 +135,37 @@ if ($result->num_rows > 0) {
             </div>
         </div>
         
-        <!-- Appointments Table -->
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
+        <!-- Replace your entire table div with this: -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive" style="over-flow: visible;">
+            <table class="table table-striped table-hover m-0">
+                <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th class="px-3">ID</th>
                         <th>Name</th>
-                        <th>Course/Year/Block</th>
+                        <th>Course/Year</th>
                         <th>Purpose</th>
                         <th>Date</th>
                         <th>Time</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th class="action-column">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($appointments)): ?>
                         <tr>
-                            <td colspan="8" class="text-center">No appointments found</td>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+                                    <p class="mt-2">No appointments found for the selected criteria.</p>
+                                </div>
+                            </td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($appointments as $appointment): ?>
                             <tr>
-                                <td><?php echo $appointment['appointment_id']; ?></td>
+                                <td class="px-3"><?php echo $appointment['appointment_id']; ?></td>
                                 <td><?php echo htmlspecialchars($appointment['name']); ?></td>
                                 <td><?php echo htmlspecialchars($appointment['course'] . ' ' . $appointment['year'] . '-' . $appointment['block']); ?></td>
                                 <td><?php echo htmlspecialchars($appointment['purpose']); ?></td>
@@ -115,18 +180,27 @@ if ($result->num_rows > 0) {
                                         <?php echo ucfirst($appointment['status']); ?>
                                     </span>
                                 </td>
-                                <td>
-                                <a href="view_appoinment.php?id=<?php echo $appointment['appointment_id']; ?>&date=<?php echo $date_filter; ?>" class="btn btn-sm btn-info">View</a>
+                                <td class="action-column">
+                                    <a href="view_appoinment.php?id=<?php echo $appointment['appointment_id']; ?>&date=<?php echo $date_filter; ?>" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
                                     <div class="dropdown d-inline">
-                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            Update
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="process/update_status.php?id=<?php echo $appointment['appointment_id']; ?>&status=approved&date=<?php echo $date_filter; ?><?php echo $status_filter != 'all' ? '&status='.$status_filter : ''; ?>">Approve</a></li>
-                                        <li><a class="dropdown-item" href="process/update_status.php?id=<?php echo $appointment['appointment_id']; ?>&status=completed&date=<?php echo $date_filter; ?><?php echo $status_filter != 'all' ? '&status='.$status_filter : ''; ?>">Complete</a></li>
-                                        <li><a class="dropdown-item" href="process/update_status.php?id=<?php echo $appointment['appointment_id']; ?>&status=cancelled&date=<?php echo $date_filter; ?><?php echo $status_filter != 'all' ? '&status='.$status_filter : ''; ?>">Cancel</a></li>
-                                        </ul>
-                                    </div>
+    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
+            data-bs-toggle="dropdown" data-bs-strategy="fixed" aria-expanded="false">
+        Update
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item py-2" href="process/update_status.php?id=<?php echo $appointment['appointment_id']; ?>&status=approved&date=<?php echo $date_filter; ?><?php echo $status_filter != 'all' ? '&status='.$status_filter : ''; ?>">
+            <span class="text-info">✓</span> Approve
+        </a></li>
+        <li><a class="dropdown-item py-2" href="process/update_status.php?id=<?php echo $appointment['appointment_id']; ?>&status=completed&date=<?php echo $date_filter; ?><?php echo $status_filter != 'all' ? '&status='.$status_filter : ''; ?>">
+            <span class="text-success">✓</span> Complete
+        </a></li>
+        <li><a class="dropdown-item py-2" href="process/update_status.php?id=<?php echo $appointment['appointment_id']; ?>&status=cancelled&date=<?php echo $date_filter; ?><?php echo $status_filter != 'all' ? '&status='.$status_filter : ''; ?>">
+            <span class="text-danger">✕</span> Cancel
+        </a></li>
+    </ul>
+</div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -135,6 +209,7 @@ if ($result->num_rows > 0) {
             </table>
         </div>
     </div>
+</div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
