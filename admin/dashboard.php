@@ -60,12 +60,12 @@ if ($result->num_rows > 0) {
         </div>
     <?php endif; ?>
 
-        <!-- Filters -->
+        <!-- Find the filter form (around line 73) and modify it: -->
         <div class="row mb-4">
             <div class="col-md-6">
-                <form action="" method="get" class="d-flex gap-2">
-                    <input type="date" name="date" class="form-control" value="<?php echo $date_filter; ?>">
-                    <select name="status" class="form-control">
+                <form action="" method="get" class="d-flex gap-2" id="filterForm">
+                    <input type="date" name="date" id="dateFilter" class="form-control" value="<?php echo $date_filter; ?>">
+                    <select name="status" id="statusFilter" class="form-control">
                         <option value="all" <?php echo $status_filter == 'all' ? 'selected' : ''; ?>>All Status</option>
                         <option value="pending" <?php echo $status_filter == 'pending' ? 'selected' : ''; ?>>Pending</option>
                         <option value="approved" <?php echo $status_filter == 'approved' ? 'selected' : ''; ?>>Approved</option>
@@ -139,3 +139,22 @@ if ($result->num_rows > 0) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<!-- Add this before the closing </body> tag -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get form elements
+    const filterForm = document.getElementById('filterForm');
+    const dateFilter = document.getElementById('dateFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    // Add event listeners to auto-submit form when inputs change
+    dateFilter.addEventListener('change', function() {
+        filterForm.submit();
+    });
+    
+    statusFilter.addEventListener('change', function() {
+        filterForm.submit();
+    });
+});
+</script>
