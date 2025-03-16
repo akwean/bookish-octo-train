@@ -5,31 +5,39 @@
     
     <form action="/process/register_process.php" method="POST">
         <div class="mb-3">
-            <label for="reg_name" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="reg_name" name="name" required>
+            <div class="floating-label">
+                <input type="text" class="floating-label__input" id="reg_name" name="name" placeholder=" " required>
+                <label for="reg_name" class="floating-label__label">Full Name</label>
+            </div>
         </div>
+        
         <div class="mb-3">
-            <label for="reg_email" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="reg_email" name="email" required>
+            <div class="floating-label">
+                <input type="email" class="floating-label__input" id="reg_email" name="email" placeholder=" " required>
+                <label for="reg_email" class="floating-label__label">Email address</label>
+            </div>
         </div>
+        
         <div class="mb-3">
-            <label for="reg_password" class="form-label">Password</label>
-            <div class="input-group">
-                <input type="password" class="form-control" id="reg_password" name="password" required>
-                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('reg_password')">
+            <div class="floating-label floating-label-password">
+                <input type="password" class="floating-label__input" id="reg_password" name="password" placeholder=" " required>
+                <label for="reg_password" class="floating-label__label">Password</label>
+                <button type="button" class="password-toggle" onclick="togglePassword('reg_password')">
                     <i class="bi bi-eye"></i>
                 </button>
             </div>
         </div>
+        
         <div class="mb-3">
-            <label for="reg_confirm_password" class="form-label">Confirm Password</label>
-            <div class="input-group">
-                <input type="password" class="form-control" id="reg_confirm_password" name="confirm_password" required>
-                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('reg_confirm_password')">
+            <div class="floating-label floating-label-password">
+                <input type="password" class="floating-label__input" id="reg_confirm_password" name="confirm_password" placeholder=" " required>
+                <label for="reg_confirm_password" class="floating-label__label">Confirm Password</label>
+                <button type="button" class="password-toggle" onclick="togglePassword('reg_confirm_password')">
                     <i class="bi bi-eye"></i>
                 </button>
             </div>
         </div>
+        
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
     <div class="mt-3 text-center">

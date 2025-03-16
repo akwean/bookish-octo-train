@@ -23,6 +23,7 @@ $appointmentController = new AppointmentController();
     <link rel="stylesheet" href="assets/css/header.css">
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/appoinment.css">
+    <link rel="stylesheet" href="assets/css/floating-labels.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>

@@ -1,0 +1,141 @@
+:root {
+  --color-background: #ffffff;
+  --color-accent: #ff8000;
+  --size-bezel: 0.5rem;
+  --size-radius: 4px;
+  --border-color: #ced4da;
+  --border-color-focus: #ff8000;
+  --label-color: #6c757d;
+  --label-color-focus: #ff8000;
+}
+
+/* Floating label input styles */
+.floating-label {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.floating-label__input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  padding: calc(var(--size-bezel) * 1.5) var(--size-bezel);
+  color: #212529;
+  background: var(--color-background);
+  border-radius: var(--size-radius);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.floating-label__input:focus {
+  border-color: var(--border-color-focus);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(255, 128, 0, 0.25);
+}
+
+.floating-label__label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: calc(var(--size-bezel) * 0.5) calc(var(--size-bezel) * 0.3);
+  margin: calc(var(--size-bezel) * 0.75) calc(var(--size-bezel) * 0.5);
+  white-space: nowrap;
+  transform: translate(0, 0);
+  transform-origin: 0 0;
+  background: transparent; /* Keep transparent always */
+  transition: transform 120ms ease-in;
+  font-weight: normal;
+  line-height: 1.2;
+  color: var(--label-color);
+  pointer-events: none;
+  z-index: 1;
+  text-shadow: none; /* Remove text shadow as we're using background now */
+}
+
+.floating-label__input:focus + .floating-label__label,
+.floating-label__input:not(:placeholder-shown) + .floating-label__label {
+  transform: translate(0.25rem, -65%) scale(0.85);
+  color: var(--label-color-focus);
+  background: rgba(255, 255, 255, 0.85); /* Semi-transparent white background */
+  padding: 0 0.3rem; /* Small padding for better readability */
+  border-radius: 3px; /* Rounded corners */
+  z-index: 2;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+}
+
+/* Special styling for modals with gradient backgrounds */
+.modal-content .floating-label__input:focus + .floating-label__label,
+.modal-content .floating-label__input:not(:placeholder-shown) + .floating-label__label {
+  background: rgba(255, 255, 255, 0.9); /* Slightly more opaque for gradient backgrounds */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Slightly stronger shadow */
+  font-weight: 500; /* Make slightly bolder for better visibility */
+}
+
+/* Adjust the label positioning for textareas */
+.floating-label__textarea + .floating-label__label {
+  margin-top: calc(var(--size-bezel) * 0.5);
+}
+
+/* Additional styles to keep the floating labels clean */
+.floating-label__input:focus,
+.floating-label__textarea:focus {
+  border-color: var(--border-color-focus);
+  box-shadow: 0 0 0 0.15rem rgba(255, 128, 0, 0.15);
+}
+
+/* For select elements */
+.floating-label__select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+
+/* For textarea elements */
+.floating-label__textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* For required fields */
+.floating-label__input:required + .floating-label__label::after {
+  content: " *";
+  color: #dc3545;
+}
+
+/* Invalid state */
+.floating-label__input.is-invalid {
+  border-color: #dc3545;
+  padding-right: calc(1.5em + 0.75rem);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.floating-label__input.is-valid {
+  border-color: #28a745;
+  padding-right: calc(1.5em + 0.75rem);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Password toggle button */
+.floating-label-password {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+  z-index: 10;
+}

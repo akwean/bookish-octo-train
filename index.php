@@ -20,6 +20,7 @@ if (isset($_SESSION['user_id']))
     <link rel="stylesheet" href="assets/css/header.css">
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/floating-labels.css">
 </head>
 <body>
 

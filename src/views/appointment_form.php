@@ -42,72 +42,92 @@ if(isset($_SESSION['user_id'])) {
             
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($userName); ?>" readonly>
+                    <div class="floating-label">
+                        <input type="text" class="floating-label__input" id="name" name="name" value="<?php echo htmlspecialchars($userName); ?>" readonly placeholder=" ">
+                        <label for="name" class="floating-label__label">Full Name</label>
+                    </div>
                     <small class="text-muted">Auto-filled from your profile</small>
                 </div>
                 
                 <div class="col-md-6 mb-3">
-                    <label for="course" class="form-label">Course</label>
-                    <input type="text" class="form-control" id="course" name="course" required>
+                    <div class="floating-label">
+                        <input type="text" class="floating-label__input" id="course" name="course" placeholder=" " required>
+                        <label for="course" class="floating-label__label">Course</label>
+                    </div>
                 </div>
             </div>
             
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <label for="block" class="form-label">Block</label>
-                    <input type="text" class="form-control" id="block" name="block" required>
+                    <div class="floating-label">
+                        <input type="text" class="floating-label__input" id="block" name="block" placeholder=" " required>
+                        <label for="block" class="floating-label__label">Block</label>
+                    </div>
                 </div>
                 
                 <div class="col-md-4 mb-3">
-                    <label for="year" class="form-label">Year</label>
-                    <select class="form-select" id="year" name="year" required>
-                        <option value="">Select Year</option>
-                        <?php foreach(AppointmentController::YEAR_CHOICES as $value => $label): ?>
+                    <div class="floating-label">
+                        <select class="floating-label__input floating-label__select" id="year" name="year" required>
+                            <option value="" selected disabled></option>
+                            <?php foreach(AppointmentController::YEAR_CHOICES as $value => $label): ?>
+                                <option value="<?php echo htmlspecialchars($value); ?>"><?php echo htmlspecialchars($label); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="year" class="floating-label__label">Year</label>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="floating-label">
+                        <select class="floating-label__input floating-label__select" id="time_slot" name="time_slot" required>
+                            <option value="" selected disabled></option>
+                            <!-- Time slots will be loaded via AJAX -->
+                        </select>
+                        <label for="time_slot" class="floating-label__label">Time Slot</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="floating-label">
+                    <select class="floating-label__input floating-label__select" id="purpose" name="purpose" required placeholder=" ">
+                        <option value="" selected disabled></option>
+                        <?php foreach(AppointmentController::PURPOSE_CHOICES as $value => $label): ?>
                             <option value="<?php echo htmlspecialchars($value); ?>"><?php echo htmlspecialchars($label); ?></option>
                         <?php endforeach; ?>
                     </select>
-                </div>
-                
-                <div class="col-md-4 mb-3">
-                    <label for="time_slot" class="form-label">Time Slot</label>
-                    <select class="form-select" id="time_slot" name="time_slot" required>
-                        <option value="">Select Time</option>
-                        <!-- Time slots will be loaded via AJAX -->
-                    </select>
+                    <label for="purpose" class="floating-label__label">Purpose</label>
                 </div>
             </div>
-            
+
             <div class="mb-3">
-                <label for="purpose" class="form-label">Purpose</label>
-                <select class="form-select" id="purpose" name="purpose" required>
-                    <option value="">Select Purpose</option>
-                    <?php foreach(AppointmentController::PURPOSE_CHOICES as $value => $label): ?>
-                        <option value="<?php echo htmlspecialchars($value); ?>"><?php echo htmlspecialchars($label); ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <div class="floating-label">
+                    <input type="text" class="floating-label__input" id="parent_guardian" name="parent_guardian" placeholder=" " required>
+                    <label for="parent_guardian" class="floating-label__label">Parent/Guardian Name</label>
+                </div>
             </div>
-            
+
             <div class="mb-3">
-                <label for="parent_guardian" class="form-label">Parent/Guardian Name</label>
-                <input type="text" class="form-control" id="parent_guardian" name="parent_guardian" required>
+                <div class="floating-label">
+                    <input type="tel" class="floating-label__input" id="contact_no" name="contact_no" placeholder=" " required>
+                    <label for="contact_no" class="floating-label__label">Contact Number</label>
+                </div>
             </div>
-            
+
             <div class="mb-3">
-                <label for="contact_no" class="form-label">Contact Number</label>
-                <input type="tel" class="form-control" id="contact_no" name="contact_no" required>
+                <div class="floating-label">
+                    <textarea class="floating-label__input floating-label__textarea" id="home_address" name="home_address" placeholder=" " rows="2" required></textarea>
+                    <label for="home_address" class="floating-label__label">Home Address</label>
+                </div>
             </div>
-            
+
             <div class="mb-3">
-                <label for="home_address" class="form-label">Home Address</label>
-                <textarea class="form-control" id="home_address" name="home_address" rows="2" required></textarea>
+                <div class="floating-label">
+                    <textarea class="floating-label__input floating-label__textarea" id="additional_notes" name="additional_notes" placeholder=" " rows="3"></textarea>
+                    <label for="additional_notes" class="floating-label__label">Additional Notes (Optional)</label>
+                </div>
             </div>
-            
-            <div class="mb-3">
-                <label for="additional_notes" class="form-label">Additional Notes (Optional)</label>
-                <textarea class="form-control" id="additional_notes" name="additional_notes" rows="3"></textarea>
-            </div>
-            
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Book Appointment</button>
             </div>
