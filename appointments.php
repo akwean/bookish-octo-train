@@ -24,6 +24,7 @@ $appointmentController = new AppointmentController();
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/appoinment.css">
     <link rel="stylesheet" href="assets/css/floating-labels.css">
+    <link rel="stylesheet" href="assets/css/scroll-top.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
@@ -96,8 +97,14 @@ $appointmentController = new AppointmentController();
     </div>
 </div>
 
+<!-- Back to Top Button -->
+<button id="back-to-top" title="Back to Top">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="assets/js/smooth-scroll.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize flatpickr date picker

@@ -21,6 +21,7 @@ if (isset($_SESSION['user_id']))
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="assets/css/floating-labels.css">
+    <link rel="stylesheet" href="assets/css/scroll-top.css">
 </head>
 <body>
 
@@ -61,6 +62,11 @@ if (isset($_SESSION['user_id']))
     </div>
 </div>
 
+<!-- Back to Top Button -->
+<button id="back-to-top" title="Back to Top">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
 <!-- Login Modal -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -90,6 +96,7 @@ if (isset($_SESSION['user_id']))
 <!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 <script src="assets/js/header.js"></script>
+<script src="assets/js/smooth-scroll.js"></script>
 <!-- Login modal trigger script -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {

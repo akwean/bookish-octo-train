@@ -4,6 +4,18 @@ body {
     padding: 0;
 }
 
+/* Global smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* For Safari compatibility & better performance with heavy pages */
+@media screen and (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
 /* Hero Section */
 .full-width-rectangle {
     width: 100%;

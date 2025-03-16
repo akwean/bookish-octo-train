@@ -24,6 +24,7 @@ $userName = getUserName($user_id, $conn);
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/appoinment.css">
     <link rel="stylesheet" href="assets/css/appoinment_history.css">
+    <link rel="stylesheet" href="assets/css/scroll-top.css">
 </head>
 <body>
 
@@ -49,8 +50,14 @@ $userName = getUserName($user_id, $conn);
     </div>
 </div>
 
+<!-- Back to Top Button -->
+<button id="back-to-top" title="Back to Top">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/appoinment_history.js"></script>
+<script src="assets/js/smooth-scroll.js"></script>
 
 </body>
 </html>
