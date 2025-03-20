@@ -3,6 +3,10 @@
         <div class="alert alert-danger">Invalid email or password. Please try again.</div>
     <?php endif; ?>
     
+    <?php if(isset($_GET['success']) && $_GET['success'] == 'password_reset'): ?>
+        <div class="alert alert-success">Your password has been reset successfully. Please log in with your new password.</div>
+    <?php endif; ?>
+    
     <form action="/process/login_process.php" method="POST">
         <div class="mb-3">
             <div class="floating-label">
@@ -19,6 +23,10 @@
                     <i class="bi bi-eye"></i>
                 </button>
             </div>
+        </div>
+        
+        <div class="mb-3 text-end">
+            <a href="forgot_password.php" class="text-decoration-none small">Forgot Password?</a>
         </div>
         
         <button type="submit" class="btn btn-primary">Login</button>
