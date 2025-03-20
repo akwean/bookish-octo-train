@@ -20,10 +20,10 @@ $sql = "CREATE TABLE IF NOT EXISTS `staff` (
 $conn->query($sql);
 
 // Create default admin user
-$name = "Admin User";
-$email = "admin@example.com";
+$name = "Nurse Joy";
+$email = "craigpark292@gmail.com";
 $password = password_hash("admin123", PASSWORD_DEFAULT); // Change this!
-$role = "admin";
+$role = "nurse";
 
 $sql = "INSERT INTO staff (name, email, password, role) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
@@ -31,7 +31,7 @@ $stmt->bind_param("ssss", $name, $email, $password, $role);
 
 if ($stmt->execute()) {
     echo "Admin user created successfully!";
-    echo "<p>Email: admin@example.com</p>";
+    echo "<p>Email: craigpark292@gmail.com</p>";
     echo "<p>Password: admin123</p>";
     echo "<p>IMPORTANT: Delete this file after setup!</p>";
 } else {
