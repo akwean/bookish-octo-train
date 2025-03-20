@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/connection.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/src/Controllers/AppointmentController.php';
+require_once '../connection.php';
+require_once '../src/Controllers/AppointmentController.php';
 
 header('Content-Type: application/json');
 

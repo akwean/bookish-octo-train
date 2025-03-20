@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/connection.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/src/Controllers/AppointmentController.php';
+require_once '../connection.php';
+require_once '../src/Controllers/AppointmentController.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {

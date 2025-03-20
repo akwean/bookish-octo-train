@@ -1,6 +1,6 @@
 <?php
 require_once 'connection.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/src/Controllers/helper.php';
+require_once 'src/Controllers/helper.php';
 
 // // If a user is logged in, redirect them to the dashboard.
 if (isset($_SESSION['user_id'])) 
