@@ -1,4 +1,7 @@
 <?php
+
+ob_start();
+
 require_once '../connection.php';
 require_once '../src/Controllers/AppointmentController.php';
 require_once '../vendor/autoload.php'; // Add PHPMailer autoloader
@@ -62,30 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $appointment_id = $appointmentController->bookAppointment($appointmentData);
     
     if ($appointment_id) {
-        // Create a log file for debugging
-        $log_file = '../logs/email_debug_' . date('Y-m-d_H-i-s') . '.log';
+        // Use PHP's error log instead of trying to create files
+        error_log("Starting email notification for appointment #" . $appointment_id);
         
-        // Ensure logs directory exists
-        if (!file_exists('../logs')) {
-            mkdir('../logs', 0755, true);
-        }
-        
-        // Start logging
-        file_put_contents($log_file, "Starting email notification process\n");
-        file_put_contents($log_file, "Recipient emails: " . print_r($GLOBALS['staff_notification_emails'], true) . "\n", FILE_APPEND);
-        
-        // Send email notification to clinic staff
+        // Send email notification to clinic staff (don't let errors disrupt the user experience)
         try {
             // Create a new PHPMailer instance
             $mail = new PHPMailer(true);
             
-            // Enable debug output
-            $mail->SMTPDebug = 3; // Verbose debug output
-            $mail->Debugoutput = function($str, $level) use ($log_file) {
-                file_put_contents($log_file, "Debug: $str\n", FILE_APPEND);
-            };
-            
-            // Server settings
+            // Server settings - suppress verbose output that would break headers
             $mail->isSMTP();
             $mail->Host = SMTP_HOST;
             $mail->SMTPAuth = true;
@@ -94,16 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $mail->SMTPSecure = SMTP_SECURE;
             $mail->Port = SMTP_PORT;
             
-            // Log SMTP settings
-            file_put_contents($log_file, "SMTP Settings:\nHost: $mail->Host\nUsername: $mail->Username\nPort: $mail->Port\n", FILE_APPEND);
-            
             // Set sender
             $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
             
             // Add recipients
             foreach ($GLOBALS['staff_notification_emails'] as $email => $name) {
                 $mail->addAddress($email, $name);
-                file_put_contents($log_file, "Added recipient: $email ($name)\n", FILE_APPEND);
             }
             
             // Email content
@@ -118,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'vaccination' => 'Vaccination (Flu & Pneumonia)'
             ];
             
-            // Create email body
+            // Create email body - same content as before
             $mail->Body = '
             <!DOCTYPE html>
             <html>
@@ -203,19 +187,16 @@ Contact: ' . $appointmentData['contact_no'] . '
             
 Please check the admin dashboard to manage this appointment.';
             
-            // Log that we're sending the email
-            file_put_contents($log_file, "Attempting to send email\n", FILE_APPEND);
-            
             // Send the email (but don't block user experience if it fails)
-            $result = $mail->send();
-            file_put_contents($log_file, "Email sent result: " . ($result ? 'Success' : 'Failed') . "\n", FILE_APPEND);
+            $mail->send();
             
         } catch (Exception $e) {
-            // Log detailed error
-            file_put_contents($log_file, "Email error: " . $mail->ErrorInfo . "\n", FILE_APPEND);
-            file_put_contents($log_file, "Exception: " . $e->getMessage() . "\n", FILE_APPEND);
-            error_log("Email notification error: " . $mail->ErrorInfo);
+            // Just log the error but don't halt execution
+            error_log("Email notification error: " . $e->getMessage());
         }
+
+        // Turn off output buffering
+        ob_end_clean();
         
         // Success - Redirect to appointment history page with auto-refresh parameter
         header("Location: /appointments_history.php?success=appointment_booked&refresh=true");

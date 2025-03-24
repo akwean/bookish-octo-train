@@ -26,6 +26,21 @@ $appointmentController = new AppointmentController();
     <link rel="stylesheet" href="assets/css/floating-labels.css">
     <link rel="stylesheet" href="assets/css/scroll-top.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <style>
+        .flatpickr-day.today {
+            background-color: #daffda !important;
+            border-color: #87d987 !important;
+            color: #208e20 !important;
+        }
+        .flatpickr-day.today.disabled {
+            background-color: #daffda !important;
+            border-color: #87d987 !important;
+            color: #208e20 !important;
+            opacity: 0.8;  /* Slightly transparent to show it's disabled */
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
 
@@ -110,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize flatpickr date picker
     const fp = flatpickr("#datepicker", {
         inline: true,
-        minDate: "today",
+        minDate: new Date().fp_incr(1), // Start from tomorrow instead of today
         dateFormat: "Y-m-d",
         disable: [
             function(date) {
@@ -240,31 +255,84 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
             
             // Attach the event listener to the new button
-            newConfirmBtn.addEventListener('click', function() {
-                // Get the modal instance
-                const modalInstance = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
-                
-                // Hide the modal
-                modalInstance.hide();
-                
-                // Get the loading overlay elements
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                const progressBar = document.getElementById('progressBar');
-                
-                // Make sure loading overlay is visible
-                loadingOverlay.style.display = 'flex';
-                loadingOverlay.classList.add('active');
-                
-                // Start progress bar animation
-                setTimeout(() => {
-                    progressBar.style.width = '100%';
-                }, 100);
-                
-                // Delay form submission to show loading animation
-                setTimeout(function() {
-                    form.submit(); // Submit the form after delay
-                }, 2000); // 2 second delay for the animation
-            });
+            // Replace the event listener for the confirm button with this:
+newConfirmBtn.addEventListener('click', function() {
+    // Get the modal instance
+    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+    
+    // Hide the modal
+    modalInstance.hide();
+    
+    // Get the loading overlay elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const progressBar = document.getElementById('progressBar');
+    
+    // Show loading overlay
+    loadingOverlay.style.display = 'flex';
+    loadingOverlay.classList.add('active');
+    
+    // Animated progress approach (more realistic than instant 100%)
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 90) {
+            // Don't complete to 100% until we get server response
+            progress = 90;
+            clearInterval(progressInterval);
+        }
+        progressBar.style.width = `${Math.min(progress, 90)}%`;
+    }, 300);
+    
+    // Get form data for AJAX submission
+    const formData = new FormData(form);
+    
+    // Submit the form via AJAX instead of regular form submission
+    fetch('/process/appointment_process.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        // When we get a response, complete the progress bar
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+        
+        // Check if the response is a redirect (in case of success/error)
+        const redirectUrl = response.headers.get('Location');
+        if (redirectUrl) {
+            // Wait a moment to show the completed progress
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 500);
+            return null;
+        }
+        return response.text();
+    })
+    .then(data => {
+        if (data) {
+            // If we got text data instead of a redirect, wait briefly then redirect to history
+            setTimeout(() => {
+                window.location.href = '/appointments_history.php?success=appointment_booked&refresh=true';
+            }, 500);
+        }
+    })
+    .catch(error => {
+        // If there's an error, show error message
+        document.querySelector('.loading-message').textContent = 'Error occurred. Please try again.';
+        progressBar.style.backgroundColor = '#dc3545';
+        
+        // Log the error
+        console.error('Submission error:', error);
+        
+        // Allow user to close the overlay after error
+        const closeButton = document.createElement('button');
+        closeButton.className = 'btn btn-danger mt-3';
+        closeButton.textContent = 'Close';
+        closeButton.addEventListener('click', () => {
+            loadingOverlay.style.display = 'none';
+        });
+        document.querySelector('.loading-overlay').appendChild(closeButton);
+    });
+});
         });
     }
 }
