@@ -5,15 +5,31 @@ require_once '../connection.php';
 
 // Check if staff is logged in
 if (!isset($_SESSION['staff_id'])) {
-    header("Location: index.php");
-    exit();
+    // Only return JSON if it's an AJAX request
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Not authenticated']);
+        exit();
+    } else {
+        // Redirect to login page for regular requests
+        header("Location: index.php");
+        exit();
+    }
+}
+
+// Only set JSON header for AJAX requests
+$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+          strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+if ($isAjax) {
+    header('Content-Type: application/json');
 }
 
 // Get filter parameters
 $date_filter = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 $status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
 
-// DASHBOARD STATISTICS
 // Get counts for each appointment status
 $stats = [
     'pending' => 0,
@@ -25,12 +41,24 @@ $stats = [
 
 $sql_stats = "SELECT status, COUNT(*) as count FROM appointments GROUP BY status";
 $result_stats = $conn->query($sql_stats);
+
 while ($row = $result_stats->fetch_assoc()) {
     if (isset($stats[$row['status']])) {
         $stats[$row['status']] = $row['count'];
     }
     $stats['total'] += $row['count'];
 }
+
+// If it's an AJAX request asking for stats, return JSON and exit
+if ($isAjax) {
+    echo json_encode([
+        'success' => true,
+        'stats' => $stats
+    ]);
+    exit();
+}
+
+// Otherwise, continue with the HTML page...
 
 // RECENT APPOINTMENTS
 $sql_recent = "SELECT * FROM appointments ORDER BY created_at DESC LIMIT 5";
@@ -527,6 +555,473 @@ if ($result->num_rows > 0) {
             location.reload();
         }, 5 * 60 * 1000); // 5 minutes
     });
+
+  
+// Real-time appointment updates
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize with current timestamp
+    let lastCheckedTimestamp = Math.floor(Date.now() / 1000);
+    console.log('Starting polling with timestamp:', lastCheckedTimestamp);
+    
+    // Get current filters
+    const dateFilter = document.getElementById('dateFilter')?.value || '';
+    const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+    
+    console.log('Filters:', { dateFilter, statusFilter });
+    
+    // Start polling for updates
+    const pollInterval = setInterval(checkForUpdates, 10000); // Poll every 10 seconds
+    
+    function checkForUpdates() {
+        console.log('Checking for updates...');
+        const url = `/admin/process/get_latest_appointments.php?timestamp=${lastCheckedTimestamp}&date=${dateFilter}&status=${statusFilter}`;
+        console.log('Request URL:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+                
+                if (data.success && data.appointments && data.appointments.length > 0) {
+                    // Update timestamp for next poll
+                    lastCheckedTimestamp = data.timestamp;
+                    console.log('Updated timestamp to:', lastCheckedTimestamp);
+                    
+                    // Show notification for new appointments
+                    const notificationCount = data.appointments.length;
+                    console.log(`Found ${notificationCount} new appointment(s)`);
+                    showNotification(`${notificationCount} new appointment(s) received!`);
+                    
+                    // Update the table with new appointments
+                    updateAppointmentsTable(data.appointments);
+                    
+                    // Update dashboard statistics
+                    updateDashboardStats();
+                    
+                    // Update quick panels
+                    updateQuickPanels(data.appointments);
+                } else {
+                    console.log('No new appointments found.');
+                }
+            })
+            .catch(error => {
+                console.error('Error polling for updates:', error);
+            });
+    }
+    
+    function showNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-info alert-dismissible fade show position-fixed bottom-0 end-0 m-3';
+        notification.innerHTML = `
+            <strong>Update!</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        // Add to document
+        document.body.appendChild(notification);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+    
+    function updateAppointmentsTable(appointments) {
+        const tableBody = document.querySelector('table tbody');
+        if (!tableBody) return;
+        
+        // Add new appointments to the table
+        appointments.forEach(appointment => {
+            // Check if appointment is already in table
+            const existingRow = document.querySelector(`tr[data-appointment-id="${appointment.appointment_id}"]`);
+            if (existingRow) {
+                // Update existing row
+                updateExistingRow(existingRow, appointment);
+            } else {
+                // Create new row and add to table
+                const newRow = createAppointmentRow(appointment);
+                tableBody.insertBefore(newRow, tableBody.firstChild);
+                
+                // Highlight new row
+                highlightRow(newRow);
+            }
+        });
+    }
+    
+    function updateExistingRow(row, appointment) {
+        // Update row data based on appointment
+        const statusCell = row.querySelector('td:nth-child(8)');
+        if (statusCell) {
+            statusCell.innerHTML = `
+                <span class="badge bg-${getStatusClass(appointment.status)}">
+                    ${capitalizeFirstLetter(appointment.status)}
+                </span>
+            `;
+            highlightRow(row);
+        }
+    }
+    
+    function createAppointmentRow(appointment) {
+        const row = document.createElement('tr');
+        row.setAttribute('data-appointment-id', appointment.appointment_id);
+        
+        // Create the row based on your table structure
+        row.innerHTML = `
+            <td class="px-3">${appointment.appointment_id}</td>
+            <td>${htmlEscape(appointment.name)}</td>
+            <td>${htmlEscape(appointment.course + ' ' + appointment.year + '-' + appointment.block)}</td>
+            <td>${htmlEscape(appointment.purpose)}</td>
+            <td>${formatDate(appointment.appointment_date)}</td>
+            <td>${appointment.time_slot}</td>
+            <td>
+                <span class="badge bg-${getStatusClass(appointment.status)}">
+                    ${capitalizeFirstLetter(appointment.status)}
+                </span>
+            </td>
+            <td class="action-column">
+                <a href="view_appoinment.php?id=${appointment.appointment_id}&date=${dateFilter}" class="btn btn-sm btn-info">
+                    <i class="bi bi-eye"></i> View
+                </a>
+                <div class="dropdown d-inline">
+                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
+                            data-bs-toggle="dropdown" data-bs-strategy="fixed" aria-expanded="false">
+                        Update
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item py-2" href="process/update_status.php?id=${appointment.appointment_id}&status=approved&date=${dateFilter}${statusFilter != 'all' ? '&status='+statusFilter : ''}">
+                            <span class="text-info">✓</span> Approve
+                        </a></li>
+                        <li><a class="dropdown-item py-2" href="process/update_status.php?id=${appointment.appointment_id}&status=completed&date=${dateFilter}${statusFilter != 'all' ? '&status='+statusFilter : ''}">
+                            <span class="text-success">✓</span> Complete
+                        </a></li>
+                        <li><a class="dropdown-item py-2" href="process/update_status.php?id=${appointment.appointment_id}&status=cancelled&date=${dateFilter}${statusFilter != 'all' ? '&status='+statusFilter : ''}">
+                            <span class="text-danger">✕</span> Cancel
+                        </a></li>
+                    </ul>
+                </div>
+            </td>
+        `;
+        
+        return row;
+    }
+    
+    function highlightRow(row) {
+        // Highlight the row with a yellow background that fades out
+        row.style.animation = 'highlight-fade 3s';
+        
+        // Add this CSS if not already in your styles:
+        if (!document.getElementById('highlight-animation')) {
+            const style = document.createElement('style');
+            style.id = 'highlight-animation';
+            style.textContent = `
+                @keyframes highlight-fade {
+                    0% { background-color: #fff3cd; }
+                    100% { background-color: transparent; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    function updateDashboardStats() {
+        // Fetch updated statistics
+        fetch('/admin/process/get_dashboard_stats.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the stats cards with new numbers
+                    document.querySelector('.stats-card.pending .card-title').textContent = data.stats.pending;
+                    document.querySelector('.stats-card.approved .card-title').textContent = data.stats.approved;
+                    document.querySelector('.stats-card.completed .card-title').textContent = data.stats.completed;
+                    document.querySelector('.stats-card.cancelled .card-title').textContent = data.stats.cancelled;
+                }
+            })
+            .catch(error => {
+                console.error('Error updating dashboard stats:', error);
+            });
+    }
+    
+    // New function to update the quick panels with new appointment data
+    function updateQuickPanels(appointments) {
+        console.log('Updating quick panels with new appointments');
+        
+        // First, update the Recent Appointments panel
+        updateRecentAppointmentsPanel(appointments);
+        
+        // Then, update the Upcoming Appointments panel
+        updateUpcomingAppointmentsPanel(appointments);
+    }
+    
+    function updateRecentAppointmentsPanel(appointments) {
+        // Get the recent appointments panel container
+        const recentPanel = document.querySelector('.card-header.bg-info').closest('.card').querySelector('.quick-view-panel');
+        if (!recentPanel) {
+            console.log('Could not find recent appointments panel');
+            return;
+        }
+        
+        // Only update if there's new content
+        if (appointments.length === 0) return;
+        
+        // Remove the "No recent appointments found" message if it exists
+        const emptyMessage = recentPanel.querySelector('.text-center.text-muted');
+        if (emptyMessage) {
+            recentPanel.innerHTML = '';
+        }
+        
+        // Limit to displaying the 5 most recent appointments
+        const recentAppointments = appointments.sort((a, b) => {
+            return new Date(b.created_at) - new Date(a.created_at);
+        }).slice(0, 5);
+        
+        // Add the new appointments to the top of the panel
+        recentAppointments.forEach(appointment => {
+            // Check if this appointment is already in the panel
+            const existingItem = recentPanel.querySelector(`.appointment-item[data-id="${appointment.appointment_id}"]`);
+            if (existingItem) {
+                // Update the existing item
+                updateAppointmentItem(existingItem, appointment, 'recent');
+            } else {
+                // Create a new appointment item
+                const isNew = (Date.now() / 1000 - new Date(appointment.created_at).getTime() / 1000) < 86400; // 24 hours
+                const statusClass = getStatusClass(appointment.status);
+                
+                const newItem = document.createElement('div');
+                newItem.className = 'appointment-item new';
+                newItem.setAttribute('data-id', appointment.appointment_id);
+                newItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">${htmlEscape(appointment.name)}
+                            ${isNew ? '<span class="badge bg-info ms-1">New</span>' : ''}
+                            </h6>
+                            <div class="text-muted small">
+                                ${formatDate(appointment.appointment_date)} at ${appointment.time_slot}
+                            </div>
+                            <div class="small mt-1">
+                                Purpose: ${htmlEscape(appointment.purpose)}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge bg-${statusClass}">
+                                ${capitalizeFirstLetter(appointment.status)}
+                            </span>
+                            <div class="small text-muted mt-1">
+                                Created: ${formatDateTime(appointment.created_at)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="view_appoinment.php?id=${appointment.appointment_id}" class="btn btn-sm btn-outline-secondary">View Details</a>
+                    </div>
+                `;
+                
+                // Insert at the top
+                if (recentPanel.firstChild) {
+                    recentPanel.insertBefore(newItem, recentPanel.firstChild);
+                } else {
+                    recentPanel.appendChild(newItem);
+                }
+                
+                // Highlight the new item
+                highlightElement(newItem);
+            }
+        });
+        
+        // Limit the panel to show only 5 items
+        const items = recentPanel.querySelectorAll('.appointment-item');
+        if (items.length > 5) {
+            for (let i = 5; i < items.length; i++) {
+                items[i].remove();
+            }
+        }
+    }
+    
+    function updateUpcomingAppointmentsPanel(appointments) {
+        // Get the upcoming appointments panel container
+        const upcomingPanel = document.querySelector('.card-header.bg-success').closest('.card').querySelector('.quick-view-panel');
+        if (!upcomingPanel) {
+            console.log('Could not find upcoming appointments panel');
+            return;
+        }
+        
+        // Only process appointments that are relevant for upcoming (pending or approved, and in the next week)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        nextWeek.setHours(23, 59, 59, 999);
+        
+        const upcomingAppointments = appointments.filter(appointment => {
+            const appointmentDate = new Date(appointment.appointment_date);
+            return (appointment.status === 'pending' || appointment.status === 'approved') && 
+                   appointmentDate >= today && appointmentDate <= nextWeek;
+        }).sort((a, b) => {
+            return new Date(a.appointment_date) - new Date(b.appointment_date);
+        });
+        
+        // If no relevant upcoming appointments, don't update
+        if (upcomingAppointments.length === 0) return;
+        
+        // Remove the "No upcoming appointments" message if it exists
+        const emptyMessage = upcomingPanel.querySelector('.text-center.text-muted');
+        if (emptyMessage) {
+            upcomingPanel.innerHTML = '';
+        }
+        
+        // Process each appointment
+        upcomingAppointments.forEach(appointment => {
+            // Check if this appointment is already in the panel
+            const existingItem = upcomingPanel.querySelector(`.appointment-item[data-id="${appointment.appointment_id}"]`);
+            if (existingItem) {
+                // Update the existing item
+                updateAppointmentItem(existingItem, appointment, 'upcoming');
+            } else {
+                // Create a new appointment item
+                const appointmentDate = new Date(appointment.appointment_date);
+                const isToday = appointmentDate.toDateString() === today.toDateString();
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const isTomorrow = appointmentDate.toDateString() === tomorrow.toDateString();
+                
+                const newItem = document.createElement('div');
+                newItem.className = 'appointment-item upcoming';
+                newItem.setAttribute('data-id', appointment.appointment_id);
+                newItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-1">${htmlEscape(appointment.name)}
+                            ${isToday ? '<span class="badge bg-danger ms-1">Today</span>' : ''}
+                            ${!isToday && isTomorrow ? '<span class="badge bg-warning ms-1">Tomorrow</span>' : ''}
+                            </h6>
+                            <div class="text-muted small">
+                                ${formatDayDate(appointment.appointment_date)} at ${appointment.time_slot}
+                            </div>
+                            <div class="small mt-1">
+                                Course: ${htmlEscape(appointment.course)} • Block: ${htmlEscape(appointment.block)}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge bg-${appointment.status === 'pending' ? 'warning' : 'info'}">
+                                ${capitalizeFirstLetter(appointment.status)}
+                            </span>
+                            <div class="small text-muted mt-1">
+                                Contact: ${htmlEscape(appointment.contact_no)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <a href="view_appoinment.php?id=${appointment.appointment_id}" class="btn btn-sm btn-outline-secondary">View Details</a>
+                    </div>
+                `;
+                
+                // Insert in the correct position (sorted by date)
+                let inserted = false;
+                const existingItems = upcomingPanel.querySelectorAll('.appointment-item');
+                for (let i = 0; i < existingItems.length; i++) {
+                    const itemId = existingItems[i].getAttribute('data-id');
+                    const existingAppointment = upcomingAppointments.find(a => a.appointment_id.toString() === itemId);
+                    
+                    if (existingAppointment && new Date(appointment.appointment_date) < new Date(existingAppointment.appointment_date)) {
+                        upcomingPanel.insertBefore(newItem, existingItems[i]);
+                        inserted = true;
+                        break;
+                    }
+                }
+                
+                if (!inserted) {
+                    upcomingPanel.appendChild(newItem);
+                }
+                
+                // Highlight the new item
+                highlightElement(newItem);
+            }
+        });
+        
+        // Limit the panel to show only 5 items
+        const items = upcomingPanel.querySelectorAll('.appointment-item');
+        if (items.length > 5) {
+            for (let i = 5; i < items.length; i++) {
+                items[i].remove();
+            }
+        }
+    }
+    
+    function updateAppointmentItem(item, appointment, type) {
+        // Update the status badge
+        const statusBadge = item.querySelector('.badge');
+        if (statusBadge) {
+            if (type === 'recent') {
+                statusBadge.className = `badge bg-${getStatusClass(appointment.status)}`;
+            } else {
+                statusBadge.className = `badge bg-${appointment.status === 'pending' ? 'warning' : 'info'}`;
+            }
+            statusBadge.textContent = capitalizeFirstLetter(appointment.status);
+        }
+        
+        // Highlight the updated item
+        highlightElement(item);
+    }
+    
+    function highlightElement(element) {
+        // First remove any existing highlight
+        element.style.transition = 'background-color 1s';
+        element.style.backgroundColor = '#fff3cd'; // Highlight color
+        
+        // After a short delay, start fading back to normal
+        setTimeout(() => {
+            element.style.backgroundColor = '';
+        }, 3000);
+    }
+    
+    // Helper function to format date and time for display
+    function formatDateTime(dateTimeString) {
+        const date = new Date(dateTimeString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }) + ', ' +
+               date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    
+    function formatDayDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: '2-digit' });
+    }
+    
+    // Helper functions
+    function htmlEscape(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+    
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+    }
+    
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    function getStatusClass(status) {
+        switch (status) {
+            case 'pending': return 'warning';
+            case 'approved': return 'info';
+            case 'completed': return 'success';
+            case 'cancelled': return 'danger';
+            default: return 'secondary';
+        }
+    }
+});
+
     </script>
 </body>
 </html>

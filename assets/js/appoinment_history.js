@@ -176,3 +176,47 @@ function getYearText(yearCode) {
     };
     return years[yearCode] || yearCode;
 }
+
+// Add real-time polling for appointment updates
+let lastCheckedTimestamp = Math.floor(Date.now() / 1000);
+
+// Poll for updates every 10 seconds
+setInterval(function() {
+    fetch(`/process/get_user_appointments_updates.php?timestamp=${lastCheckedTimestamp}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.appointments.length > 0) {
+                // Update timestamp for next poll
+                lastCheckedTimestamp = data.timestamp;
+                
+                // Show notification for updated appointments
+                showUpdateNotification(data.appointments.length);
+                
+                // Refresh appointments display
+                loadAppointments();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking for updates:', error);
+        });
+}, 10000);
+
+function showUpdateNotification(count) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'alert alert-info alert-dismissible fade show';
+    notification.innerHTML = `
+        <strong>Update!</strong> ${count} appointment(s) have been updated.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    // Add to page
+    const container = document.querySelector('.container');
+    container.insertBefore(notification, container.firstChild);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
