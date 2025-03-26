@@ -18,5 +18,7 @@ $database = "clinic_db";
 // Error reporting and timezone settings
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-date_default_timezone_set('UTC');
+
+// Set the default timezone to Asia/Manila (Philippines)
+date_default_timezone_set('Asia/Manila');
 ?>
