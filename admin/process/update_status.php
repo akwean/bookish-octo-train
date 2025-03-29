@@ -55,6 +55,15 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
         }
     }
     
+    // Set the MySQL session variable to pass the acting staff's ID into the trigger
+    // ...existing code in update_status.php...
+    $staff_id = $_SESSION['staff_id'];
+    $user_id = $_SESSION['user_id'];
+    $conn->query("SET @current_staff = $staff_id");
+    $conn->query("SET @current_user = $user_id");
+    
+    // Then run the UPDATE query.
+
     // Update appointment status
     $sql = "UPDATE appointments SET status = ? WHERE appointment_id = ?";
     $stmt = $conn->prepare($sql);
