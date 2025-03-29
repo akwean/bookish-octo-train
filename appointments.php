@@ -267,6 +267,12 @@ newConfirmBtn.addEventListener('click', function() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     const progressBar = document.getElementById('progressBar');
     
+    // Reset any previous error states
+    loadingOverlay.querySelectorAll('.btn-danger').forEach(btn => btn.remove());
+    document.querySelector('.loading-message').textContent = 'Processing your appointment...';
+    progressBar.style.backgroundColor = ''; // Reset to default color
+    progressBar.style.width = '0%'; // Reset progress
+    
     // Show loading overlay
     loadingOverlay.style.display = 'flex';
     loadingOverlay.classList.add('active');
