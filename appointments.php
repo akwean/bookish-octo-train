@@ -292,6 +292,74 @@ newConfirmBtn.addEventListener('click', function() {
         body: formData
     })
     .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                // Clear the loading overlay first
+                loadingOverlay.style.display = 'none';
+                
+                if (data.error === 'slot_taken') {
+                    // Create and show a nicer error modal for slot conflicts
+                    const errorModal = document.createElement('div');
+                    errorModal.className = 'modal fade';
+                    errorModal.id = 'slotErrorModal';
+                    errorModal.setAttribute('tabindex', '-1');
+                    errorModal.setAttribute('role', 'dialog');
+                    errorModal.setAttribute('aria-hidden', 'true');
+                    errorModal.style.zIndex = '1500'; // Ensure it's above other elements
+                    
+                    errorModal.innerHTML = `
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-danger">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title fw-bold" style="color: black">
+                                        <i class="bi bi-exclamation-circle me-2"></i>
+                                        Time Slot Unavailable
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-4">
+                                    <div class="text-center mb-4">
+                                        <i class="bi bi-calendar-x text-danger" style="font-size: 3.5rem;"></i>
+                                    </div>
+                                    <div class="alert alert-danger">
+                                        <p class="mb-1"><strong>This appointment slot is no longer available.</strong></p>
+                                        <p class="small mb-0">Someone else has booked ${data.time} on ${formatDate(data.date)}</p>
+                                    </div>
+                                    <p>Please select a different time for your appointment.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Choose Another Time</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add to document
+                    document.body.appendChild(errorModal);
+                    
+                    // Ensure Bootstrap is loaded before initializing modal
+                    if (typeof bootstrap !== 'undefined') {
+                        const bsModal = new bootstrap.Modal(document.getElementById('slotErrorModal'));
+                        bsModal.show();
+                        
+                        // Remove from DOM after it's hidden
+                        errorModal.addEventListener('hidden.bs.modal', function() {
+                            errorModal.remove();
+                        });
+                    } else {
+                        // Fallback if Bootstrap JS isn't loaded
+                        console.error('Bootstrap not loaded - showing alert instead');
+                        alert('Time Slot Unavailable: This appointment slot has been taken. Please select another time.');
+                    }
+                } else {
+                    // ...existing code...
+                }
+                throw new Error(data.error);
+            });
+        }
+        return response;
+    })
+    .then(response => {
         // When we get a response, complete the progress bar
         clearInterval(progressInterval);
         progressBar.style.width = '100%';

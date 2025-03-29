@@ -52,12 +52,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
+    // Check if timeslot is already taken
+    $sql = "SELECT appointment_id FROM appointments WHERE appointment_date = ? AND time_slot = ? AND status <> 'cancelled'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $appointmentData['appointment_date'], $appointmentData['time_slot']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Return a JSON response with detailed error information for AJAX requests
+        http_response_code(409); // Conflict status code
+        echo json_encode([
+            'error' => 'slot_taken',
+            'message' => 'This time slot is already booked',
+            'date' => $appointmentData['appointment_date'],
+            'time' => $appointmentData['time_slot']
+        ]);
+        exit();
+    }
+
     // Process the appointment
     $appointmentController = new AppointmentController();
     
     // Check if time slot is available
     if (!$appointmentController->checkTimeSlotAvailability($appointmentData['appointment_date'], $appointmentData['time_slot'])) {
-        header("Location: /appointments.php?error=slot_taken");
+        http_response_code(400);
+        echo json_encode(['error' => 'slot_taken']);
         exit();
     }
     
