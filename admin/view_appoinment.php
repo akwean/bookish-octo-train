@@ -86,6 +86,7 @@ $appointment = $result->fetch_assoc();
                             ?>
                             <a href="dashboard.php<?php echo $date_param; ?>" class="btn btn-secondary">Back to Dashboard</a>
                             
+                            <?php if($appointment['status'] != 'cancelled'): ?>
                             <div class="dropdown">
                                 <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                     Update Status
@@ -100,6 +101,11 @@ $appointment = $result->fetch_assoc();
                                     <li><a class="dropdown-item" href="process/update_status.php?id=<?php echo $appointment['appointment_id']; ?>&status=cancelled<?php echo $date_param; ?>&reset=true">Cancel</a></li>
                                 </ul>
                             </div>
+                            <?php else: ?>
+                            <button class="btn btn-secondary" disabled title="Cancelled appointments cannot be updated">
+                                <i class="bi bi-lock"></i> Status Locked
+                            </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

@@ -498,6 +498,7 @@ if ($result->num_rows > 0) {
                                             <a href="view_appoinment.php?id=<?php echo $appointment['appointment_id']; ?>&date=<?php echo $date_filter; ?>" class="btn btn-sm btn-info">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
+                                            <?php if($appointment['status'] != 'cancelled'): ?>
                                             <div class="dropdown d-inline">
                                                 <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
                                                         data-bs-toggle="dropdown" data-bs-strategy="fixed" aria-expanded="false">
@@ -515,6 +516,11 @@ if ($result->num_rows > 0) {
                                                     </a></li>
                                                 </ul>
                                             </div>
+                                            <?php else: ?>
+                                            <button class="btn btn-sm btn-secondary" disabled title="Cancelled appointments cannot be updated">
+                                                <i class="bi bi-lock"></i> Locked
+                                            </button>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -526,11 +532,9 @@ if ($result->num_rows > 0) {
             </div>
         </div>
     </div>
-    
     <div class="container-fluid py-4">
         <!-- Footer spacing -->
     </div>
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Add this before the closing </body> tag -->
@@ -545,7 +549,6 @@ if ($result->num_rows > 0) {
         dateFilter.addEventListener('change', function() {
             filterForm.submit();
         });
-        
         statusFilter.addEventListener('change', function() {
             filterForm.submit();
         });
@@ -555,8 +558,8 @@ if ($result->num_rows > 0) {
             location.reload();
         }, 5 * 60 * 1000); // 5 minutes
     });
-
-  
+        
+        // Auto-refresh the dashboard every 5 minutes
 // Real-time appointment updates
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize with current timestamp
@@ -566,12 +569,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get current filters
     const dateFilter = document.getElementById('dateFilter')?.value || '';
     const statusFilter = document.getElementById('statusFilter')?.value || 'all';
-    
     console.log('Filters:', { dateFilter, statusFilter });
     
     // Start polling for updates
     const pollInterval = setInterval(checkForUpdates, 10000); // Poll every 10 seconds
-    
+
     function checkForUpdates() {
         console.log('Checking for updates...');
         const url = `/admin/process/get_latest_appointments.php?timestamp=${lastCheckedTimestamp}&date=${dateFilter}&status=${statusFilter}`;
@@ -584,7 +586,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log('Received data:', data);
-                
                 if (data.success && data.appointments && data.appointments.length > 0) {
                     // Update timestamp for next poll
                     lastCheckedTimestamp = data.timestamp;
@@ -611,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error polling for updates:', error);
             });
     }
-    
+
     function showNotification(message) {
         // Create notification element
         const notification = document.createElement('div');
@@ -620,7 +621,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <strong>Update!</strong> ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
-        
         // Add to document
         document.body.appendChild(notification);
         
@@ -630,7 +630,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => notification.remove(), 300);
         }, 5000);
     }
-    
+
     function updateAppointmentsTable(appointments) {
         const tableBody = document.querySelector('table tbody');
         if (!tableBody) return;
@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     function updateExistingRow(row, appointment) {
         // Update row data based on appointment
         const statusCell = row.querySelector('td:nth-child(8)');
@@ -665,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
             highlightRow(row);
         }
     }
-    
+
     function createAppointmentRow(appointment) {
         const row = document.createElement('tr');
         row.setAttribute('data-appointment-id', appointment.appointment_id);
@@ -687,6 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <a href="view_appoinment.php?id=${appointment.appointment_id}&date=${dateFilter}" class="btn btn-sm btn-info">
                     <i class="bi bi-eye"></i> View
                 </a>
+                ${appointment.status !== 'cancelled' ? `
                 <div class="dropdown d-inline">
                     <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
                             data-bs-toggle="dropdown" data-bs-strategy="fixed" aria-expanded="false">
@@ -704,6 +705,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a></li>
                     </ul>
                 </div>
+                ` : `
+                <button class="btn btn-sm btn-secondary" disabled title="Cancelled appointments cannot be updated">
+                    <i class="bi bi-lock"></i> Locked
+                </button>
+                `}
             </td>
         `;
         
@@ -979,7 +985,7 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.backgroundColor = '';
         }, 3000);
     }
-    
+       
     // Helper function to format date and time for display
     function formatDateTime(dateTimeString) {
         const date = new Date(dateTimeString);

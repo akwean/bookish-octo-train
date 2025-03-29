@@ -21,6 +21,40 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
         exit();
     }
     
+    // Check if the appointment is already cancelled
+    $check_sql = "SELECT status FROM appointments WHERE appointment_id = ?";
+    $check_stmt = $conn->prepare($check_sql);
+    $check_stmt->bind_param("i", $appointment_id);
+    $check_stmt->execute();
+    $result = $check_stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        if ($row['status'] === 'cancelled') {
+            $_SESSION['error'] = "Cannot update a cancelled appointment";
+            
+            // Redirect back with appropriate parameters
+            $redirect_url = "../dashboard.php";
+            if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
+                $redirect_url = "../view_appoinment.php?id=" . $appointment_id;
+                if (isset($_GET['date'])) {
+                    $redirect_url .= "&date=" . $_GET['date'];
+                }
+            } else {
+                if (isset($_GET['date'])) {
+                    $redirect_url .= "?date=" . $_GET['date'];
+                    if (isset($_GET['status']) && $_GET['status'] !== 'all') {
+                        $redirect_url .= "&status=" . $_GET['status'];
+                    }
+                } elseif (isset($_GET['status']) && $_GET['status'] !== 'all') {
+                    $redirect_url .= "?status=" . $_GET['status'];
+                }
+            }
+            
+            header("Location: " . $redirect_url);
+            exit();
+        }
+    }
+    
     // Update appointment status
     $sql = "UPDATE appointments SET status = ? WHERE appointment_id = ?";
     $stmt = $conn->prepare($sql);
@@ -32,23 +66,36 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
         $_SESSION['error'] = "Failed to update appointment status";
     }
     
-    // Build redirect URL with preserved date filter but always set status to "all"
-    $redirect_url = "../dashboard.php";
-    
-    // Preserve date filter if present
-    if(isset($_GET['date'])) {
-        $redirect_url .= "?date=" . $_GET['date'];
-        // Always set status to "all" after updating
-        $redirect_url .= "&status=all";
+    // Handle redirect based on where the request came from
+    if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
+        // Redirect back to the appointment view page
+        $redirect = "../view_appoinment.php?id=" . $appointment_id;
+        if (isset($_GET['date'])) {
+            $redirect .= "&date=" . $_GET['date'];
+        }
     } else {
-        // If no date was specified, still use "all" for status
-        $redirect_url .= "?status=all";
+        // Redirect back to dashboard with filters preserved
+        $redirect = "../dashboard.php";
+        $params = [];
+        
+        if (isset($_GET['date'])) {
+            $params[] = "date=" . $_GET['date'];
+        }
+        
+        if (isset($_GET['status']) && $_GET['status'] !== 'all') {
+            $params[] = "status=" . $_GET['status'];
+        }
+        
+        if (!empty($params)) {
+            $redirect .= "?" . implode("&", $params);
+        }
     }
     
-    header("Location: $redirect_url");
-    exit();
-} else {
-    header("Location: ../dashboard.php");
+    header("Location: $redirect");
     exit();
 }
+
+// If accessed without proper parameters
+header("Location: ../dashboard.php");
+exit();
 ?>
