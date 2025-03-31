@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     
     // Check if timeslot is already taken
-    $sql = "SELECT appointment_id FROM appointments WHERE appointment_date = ? AND time_slot = ? AND status <> 'cancelled'";
+    $sql = "SELECT appointment_id FROM appointments WHERE appointment_date = ? AND time_slot = ? AND status = 'approved'";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $appointmentData['appointment_date'], $appointmentData['time_slot']);
     $stmt->execute();
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         http_response_code(409); // Conflict status code
         echo json_encode([
             'error' => 'slot_taken',
-            'message' => 'This time slot is already booked',
+            'message' => 'This time slot has already been approved for another appointment',
             'date' => $appointmentData['appointment_date'],
             'time' => $appointmentData['time_slot']
         ]);

@@ -87,9 +87,9 @@ class Appointment {
         return $result->fetch_assoc();
     }
     
-    // Check if time slot is available
+    // Check if time slot is available - only block if there's an approved appointment
     public function isTimeSlotAvailable($date, $time) {
-        $query = "SELECT COUNT(*) as count FROM {$this->table} WHERE appointment_date = ? AND time_slot = ? AND status != 'cancelled'";
+        $query = "SELECT COUNT(*) as count FROM {$this->table} WHERE appointment_date = ? AND time_slot = ? AND status = 'approved'";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("ss", $date, $time);
         $stmt->execute();
