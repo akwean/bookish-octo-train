@@ -56,14 +56,18 @@ if (isset($_GET['id']) && isset($_GET['status'])) {
     }
     
     // Set the MySQL session variable to pass the acting staff's ID into the trigger
-    // ...existing code in update_status.php...
     $staff_id = $_SESSION['staff_id'];
-    $user_id = $_SESSION['user_id'];
+    
+    // Fix: Check if user_id exists in session, otherwise set it to NULL for database
+    // This handles admin-only login scenarios (different browser/incognito mode)
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
+    
+    // Set the staff ID for database triggers
     $conn->query("SET @current_staff = $staff_id");
+    
+    // Only set user_id if it exists, otherwise use NULL
     $conn->query("SET @current_user = $user_id");
     
-    // Then run the UPDATE query.
-
     // Update appointment status
     $sql = "UPDATE appointments SET status = ? WHERE appointment_id = ?";
     $stmt = $conn->prepare($sql);
