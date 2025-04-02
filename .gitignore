@@ -4,7 +4,7 @@
 .env.backup
 
 # Composer dependencies
-/vendor/
+#/vendor/
 
 # Docker volumes data
 /db_data/
