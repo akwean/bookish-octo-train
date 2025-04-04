@@ -54,8 +54,8 @@ if(isset($_SESSION['user_id'])) {
                         <input type="text" class="floating-label__input" id="course" name="course" placeholder=" " required>
                         <label for="course" class="floating-label__label">Course</label>
                     </div>
+                    <small class="text-muted">Use course abbreviation (BSCS, BSIT, etc.)</small>
                 </div>
-            </div>
             
             <div class="row">
                 <div class="col-md-4 mb-3">
