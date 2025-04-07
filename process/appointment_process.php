@@ -215,6 +215,143 @@ Please check the admin dashboard to manage this appointment.';
             error_log("Email notification error: " . $e->getMessage());
         }
 
+        // Now send confirmation email to the user
+        try {
+            // Get user's email from the database
+            $userSql = "SELECT email FROM users WHERE user_id = ?";
+            $userStmt = $conn->prepare($userSql);
+            $userStmt->bind_param("i", $user_id);
+            $userStmt->execute();
+            $userResult = $userStmt->get_result();
+            
+            if ($userResult->num_rows > 0) {
+                $userData = $userResult->fetch_assoc();
+                $userEmail = $userData['email'];
+                
+                // Create a new PHPMailer instance for user email
+                $userMail = new PHPMailer(true);
+                
+                // Server settings
+                $userMail->isSMTP();
+                $userMail->Host = SMTP_HOST;
+                $userMail->SMTPAuth = true;
+                $userMail->Username = SMTP_USERNAME;
+                $userMail->Password = SMTP_PASSWORD;
+                $userMail->SMTPSecure = SMTP_SECURE;
+                $userMail->Port = SMTP_PORT;
+                
+                // Set sender
+                $userMail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+                
+                // Add user as recipient
+                $userMail->addAddress($userEmail, $appointmentData['name']);
+                
+                // Email content
+                $userMail->isHTML(true);
+                $userMail->Subject = 'Your Appointment Confirmation - BUPC Clinic';
+                
+                // Create email body for user
+                $userMail->Body = '
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #ff8000; color: white; padding: 15px; text-align: center; }
+                        .content { padding: 20px; background-color: #f9f9f9; border: 1px solid #ddd; }
+                        .appointment-details { margin: 20px 0; background-color: white; padding: 15px; border: 1px solid #eee; border-radius: 5px; }
+                        .appointment-details table { width: 100%; border-collapse: collapse; }
+                        .appointment-details th { text-align: left; padding: 8px; background-color: #f2f2f2; }
+                        .appointment-details td { padding: 8px; border-top: 1px solid #ddd; }
+                        .status { display: inline-block; background-color: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 4px; }
+                        .footer { margin-top: 20px; font-size: 12px; color: #777; text-align: center; }
+                        .button { display: inline-block; background-color: #ff8000; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Appointment Confirmation</h1>
+                        </div>
+                        <div class="content">
+                            <p>Dear ' . $appointmentData['name'] . ',</p>
+                            <p>Thank you for booking an appointment with BUPC Clinic. Your appointment details are as follows:</p>
+                            
+                            <div class="appointment-details">
+                                <table>
+                                    <tr>
+                                        <td><strong>Date:</strong></td>
+                                        <td>' . date('l, F j, Y', strtotime($appointmentData['appointment_date'])) . '</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Time:</strong></td>
+                                        <td>' . $appointmentData['time_slot'] . '</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Purpose:</strong></td>
+                                        <td>' . (isset($purposeMap[$appointmentData['purpose']]) ? $purposeMap[$appointmentData['purpose']] : $appointmentData['purpose']) . '</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Status:</strong></td>
+                                        <td><span class="status">Pending</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <p><strong>Important Notes:</strong></p>
+                            <ul>
+                                <li>Please arrive 10 minutes before your scheduled appointment time.</li>
+                                <li>Your appointment is currently <strong>pending</strong> and will be reviewed by our staff.</li>
+                                <li>You will receive a notification when your appointment is approved.</li>
+                                <li>If you need to cancel or reschedule, please do so at least 24 hours in advance.</li>
+                            </ul>
+                            
+                            <p style="text-align: center; margin-top: 25px;">
+                                <a href="http://localhost:8080/appointments_history.php" class="button">View My Appointments</a>
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p>This is an automated confirmation from the BUPC Clinic Appointment System.</p>
+                            <p>&copy; ' . date('Y') . ' BUPC Clinic. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>';
+                
+                // Plain text alternative
+                $userMail->AltBody = 'Appointment Confirmation - BUPC Clinic
+
+Dear ' . $appointmentData['name'] . ',
+
+Thank you for booking an appointment with BUPC Clinic. Your appointment details are as follows:
+
+Date: ' . date('l, F j, Y', strtotime($appointmentData['appointment_date'])) . '
+Time: ' . $appointmentData['time_slot'] . '
+Purpose: ' . (isset($purposeMap[$appointmentData['purpose']]) ? $purposeMap[$appointmentData['purpose']] : $appointmentData['purpose']) . '
+Status: Pending
+
+Important Notes:
+- Please arrive 10 minutes before your scheduled appointment time.
+- Your appointment is currently pending and will be reviewed by our staff.
+- You will receive a notification when your appointment is approved.
+- If you need to cancel or reschedule, please do so at least 24 hours in advance.
+
+To view your appointments, please visit: http://localhost:8080/appointments_history.php
+
+This is an automated confirmation from the BUPC Clinic Appointment System.';
+                
+                // Send email to user
+                $userMail->send();
+                error_log("Confirmation email sent to user: " . $userEmail);
+            } else {
+                error_log("Could not find email for user ID: " . $user_id);
+            }
+        } catch (Exception $e) {
+            // Log error but continue
+            error_log("User confirmation email error: " . $e->getMessage());
+        }
+
         // Turn off output buffering
         ob_end_clean();
         
